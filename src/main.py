@@ -1,6 +1,8 @@
-import hashlib
-import json
 import random
+from datetime import timedelta
+
+from flask import Blueprint, request, jsonify, make_response, Flask
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 
 
 def is_not_blank(value):
@@ -46,27 +48,31 @@ class User:
         print(age)
 
 
-class system:
+class System:
     def __init__(self):
         self.users = []
 
     def add_user(self, name: str, secret: str, age: int):
         user = User(name, secret, age)
         self.users.append(user)
+        return user
 
     def login_user(self, name: str, secret: str):
         for user in self.users:
-            if user.name() == name:
+            if user.name == name:
                 return user.login(name, secret)
         print("Error: User not found")
         return False
 
-    def generate_token(self):
+    def hash_to_validate(self):
         return str(random.randint(1000, 9999))
 
     def show_users(self):
         for user in self.users:
-            print(f"User: {user.name}, secret: {user.secret}, is adult: {is_adult(user.age())}")
+            print(f"User: {user.name}, secret: {user.secret}, is adult: {is_adult(user.age)}")
+
+    def getUsers(self):
+        return self.users
 
     def delete_user(self, name):
         for user in self.users:
@@ -77,8 +83,44 @@ class system:
         print("Error: User not found")
 
 
+user_bp = Blueprint('user', __name__)
+
+
+@user_bp.route('/users', methods=['POST'])
+def create_user():
+    is_not_blank(request.json['name'])
+    is_not_blank(request.json['secret'])
+    is_not_blank(request.json['age'])
+    system = System()
+    return jsonify(system.login_user(request.json['name'], request.json['secret'], request.json['age'])), 201
+
+
+@user_bp.route('/users/login', methods=['POST'])
+def login_user():
+    is_not_blank(request.json['name'])
+    is_not_blank(request.json['secret'])
+    is_not_blank(request.json['age'])
+    system = System()
+    if system.login_user(request.json['name'], request.json['secret']):
+        return make_response({'token': create_access_token(identity=system.hash_to_validate())}), 200
+    return make_response({"menssage": "Invalid credentials"}), 401
+
+
+@user_bp.route('/users', methods=['GET'])
+@jwt_required()
+def get_users():
+    system = System()
+    return jsonify(system.getUsers()), 200
+
+
+app = Flask(__name__)
+app.config["JWT_SECRET_KEY"] = "super-secret-key"
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+app.register_blueprint(user_bp)
+jwt = JWTManager(app)
+
 if __name__ == "__main__":
-    system = system()
+    system = System()
 
     name = input("Type your name: ")
     secret = input("Type your secret: ")
@@ -95,9 +137,11 @@ if __name__ == "__main__":
     else:
         print("Error")
 
-    print(f"Token generated: {system.generate_token()}")
+    print(f"Token generated: {system.hash_to_validate()}")
 
     system.show_users()
 
     name = input("Type your name for delete: ")
     system.delete_user(name)
+
+    app.run(host="0.0.0.0", port=5000, debug=True)
