@@ -23,6 +23,9 @@ class Usuario:
         with open(f"{self.nombre}_data.json", "w") as file:
             json.dump({"nombre": self.nombre, "password": self.password}, file)
 
+    def holamundo(self):
+        return "hola mundo"
+
 
 class Sistema:
     def __init__(self):
