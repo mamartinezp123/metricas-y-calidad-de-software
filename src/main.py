@@ -26,6 +26,9 @@ class Usuario:
     def holamundo(self):
         return "hola mundo"
 
+    def holamundo2(self):
+        return "hola mundo"
+
 
 class Sistema:
     def __init__(self):
