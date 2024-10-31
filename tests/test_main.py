@@ -1,9 +1,9 @@
 import unittest
-from src.main import Sistema
+
+from src.main import User
 
 
 class TestMain(unittest.TestCase):
-    def test_agregar_usuario(self):
-        sistema = Sistema()
-        sistema.agregar_usuario("testuser", "password123")
-        self.assertEqual(len(sistema.usuarios), 1)
+    def test_instance_user_success(self):
+        user = User("testuser", "password123", 15)
+        self.assertEqual(user.secret, "password123")
