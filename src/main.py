@@ -2,7 +2,7 @@ import random
 from datetime import timedelta
 
 from flask import Blueprint, request, jsonify, make_response, Flask
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_csrf_token
 
 
 def is_not_blank(value):
