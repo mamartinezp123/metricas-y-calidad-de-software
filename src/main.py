@@ -40,11 +40,11 @@ class User:
     def print_age(self, age):
         print(age)
 
-    def print_name(age):
-        print(age)
+    def print_name(self, name):
+        print(name)
 
-    def print_secret(age):
-        print(age)
+    def print_secret(self, secret):
+        print(secret)
 
 
 class System:
