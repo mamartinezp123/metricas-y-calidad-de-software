@@ -57,18 +57,19 @@ class UserBlueprintTestCase(unittest.TestCase):
         """Configura la aplicación Flask para pruebas y JWT."""
         cls.app = app
         cls.app.config["TESTING"] = True
+        cls.app.config["WTF_CSRF_ENABLED"] = False  # Deshabilita CSRF para pruebas
         cls.client = cls.app.test_client()
 
     @patch('src.main.System.add_user')
     def test_create_user(self, mock_add_user):
         """Prueba la creación de usuario a través de la ruta /users."""
+        mock_add_user.return_value = User("TestUser", "secret123", 25)
         response = self.client.post('/users', json={
             "name": "TestUser",
             "secret": "secret123",
             "age": 25
         })
-        print(response)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 201)
 
     @patch('src.main.System.login_user')
     def test_login_user_success(self, mock_login_user):
@@ -77,8 +78,9 @@ class UserBlueprintTestCase(unittest.TestCase):
         response = self.client.post('/users/login', json={
             "name": "TestUser",
             "secret": "secret123"
-        })
-        self.assertEqual(response.status_code, 400)
+        }, headers={'Content-Type': 'application/json'})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("token", json.loads(response.data))
 
     def test_login_user_failure(self):
         """Prueba de inicio de sesión fallido a través de la ruta /users/login."""
@@ -86,7 +88,8 @@ class UserBlueprintTestCase(unittest.TestCase):
             "name": "WrongUser",
             "secret": "wrongSecret"
         })
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 401)
+        self.assertIn("Invalid credentials", response.get_json().get("menssage"))
 
     def test_get_users(self):
         """Prueba para la ruta /users con token de acceso JWT."""
@@ -98,6 +101,9 @@ class UserBlueprintTestCase(unittest.TestCase):
 
     def test_user(self):
         user = User("Test", "test", 18)
+        user.print_age(18)
+        user.print_name("Test")
+        user.print_secret("test")
         self.assertEqual("Test", user.get_name())
         self.assertEqual("test", user.get_secret())
         self.assertEqual(18, user.get_age())
