@@ -3,8 +3,8 @@ import random
 from datetime import timedelta
 
 from flask import Blueprint, request, jsonify, make_response, Flask
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from flask_wtf import CSRFProtect
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_csrf_token
 
 
 def is_not_blank(value):
@@ -113,6 +113,7 @@ def get_users():
     system = System()
     return jsonify(system.get_users()), 200
 
+
 csrf = CSRFProtect()
 
 app = Flask(__name__)
@@ -147,4 +148,4 @@ if __name__ == "__main__":
     name = input("Type your name for delete: ")
     system.delete_user(name)
 
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
