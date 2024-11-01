@@ -93,16 +93,15 @@ system = System()
 def create_user():
     is_not_blank(request.json['name'])
     is_not_blank(request.json['secret'])
-    is_not_blank(request.json['age'])
-    return jsonify(system.add_user(request.json['name'], request.json['secret'], request.json['age'])), 201
-
+    user = system.add_user(request.json['name'], request.json['secret'], request.json['age'])
+    return jsonify({"name": user.name, "secret": user.secret, "age": user.age}), 201
 
 @user_bp.route('/users/login', methods=['POST'])
 def login_user():
     is_not_blank(request.json['name'])
     is_not_blank(request.json['secret'])
-    is_not_blank(request.json['age'])
-    if system.login_user(request.json['name'], request.json['secret']): return make_response(
+    if system.login_user(request.json['name'], request.json['secret']):
+        return make_response(
         {'token': create_access_token(identity=system.hash_to_validate())}), 200
     return make_response({"menssage": "Invalid credentials"}), 401
 
