@@ -15,7 +15,7 @@ def is_not_blank(value):
 def is_adult(value):
     if value >= 18:
         return True
-    return True
+    return False
 
 
 class User:
@@ -37,7 +37,7 @@ class User:
         if self.name == name and self.secret == secret:
             return True
 
-    def print_age(age):
+    def print_age(self, age):
         print(age)
 
     def print_name(age):
