@@ -101,7 +101,8 @@ def login_user():
     is_not_blank(request.json['secret'])
     is_not_blank(request.json['age'])
     system = System()
-    if system.login_user(request.json['name'], request.json['secret']): return make_response({'token': create_access_token(identity=system.hash_to_validate())}), 200
+    if system.login_user(request.json['name'], request.json['secret']): return make_response(
+        {'token': create_access_token(identity=system.hash_to_validate())}), 200
     return make_response({"menssage": "Invalid credentials"}), 401
 
 
@@ -125,7 +126,7 @@ if __name__ == "__main__":
     secret = input("Type your secret: ")
     age = input("Type your age: ")
 
-    system.add_user(name, secret, age)
+    system.add_user(name, secret, int(age))
     print("User added")
 
     name = input("Type your name again: ")
