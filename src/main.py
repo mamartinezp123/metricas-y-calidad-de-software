@@ -3,6 +3,7 @@ import random
 from datetime import timedelta
 
 from flask import Blueprint, request, jsonify, make_response, Flask
+from flask_wtf import CSRFProtect
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_csrf_token
 
 
@@ -112,12 +113,14 @@ def get_users():
     system = System()
     return jsonify(system.get_users()), 200
 
+csrf = CSRFProtect()
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = os.getenv("SIGNING_KEY", "default_secret_key")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.register_blueprint(user_bp)
 jwt = JWTManager(app)
+csrf.init_app(app)
 
 if __name__ == "__main__":
     system = System()
