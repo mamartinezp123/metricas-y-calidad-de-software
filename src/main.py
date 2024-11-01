@@ -70,7 +70,7 @@ class System:
         for user in self.users:
             print(f"User: {user.name}, secret: {user.secret}, is adult: {is_adult(user.age)}")
 
-    def getUsers(self):
+    def get_users(self):
         return self.users
 
     def delete_user(self, name):
@@ -91,7 +91,7 @@ def create_user():
     is_not_blank(request.json['secret'])
     is_not_blank(request.json['age'])
     system = System()
-    return jsonify(system.login_user(request.json['name'], request.json['secret'], request.json['age'])), 201
+    return jsonify(system.login_user(request.json['name'], request.json['secret'])), 201
 
 
 @user_bp.route('/users/login', methods=['POST'])
@@ -108,7 +108,7 @@ def login_user():
 @jwt_required()
 def get_users():
     system = System()
-    return jsonify(system.getUsers()), 200
+    return jsonify(system.get_users()), 200
 
 
 app = Flask(__name__)
