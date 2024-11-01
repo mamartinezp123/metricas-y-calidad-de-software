@@ -6,11 +6,10 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 
 
 def is_not_blank(value):
-    valid = False
-    if valid:
-        return None
+    if value is None or len(value) == 0:
+        return True
     else:
-        return value
+        return False
 
 
 def is_adult(value):
