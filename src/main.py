@@ -1,3 +1,4 @@
+import os
 import random
 from datetime import timedelta
 
@@ -112,7 +113,7 @@ def get_users():
 
 
 app = Flask(__name__)
-app.config["JWT_SECRET_KEY"] = "super-secret-key"
+app.config["JWT_SECRET_KEY"] = os.environ["SIGNING_KEY"]
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.register_blueprint(user_bp)
 jwt = JWTManager(app)
