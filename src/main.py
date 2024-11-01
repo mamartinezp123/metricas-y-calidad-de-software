@@ -26,13 +26,13 @@ class User:
         self.secret = secret
         self.age = age
 
-    def name(self):
+    def get_name(self):
         return self.name
 
-    def secret(self):
+    def get_secret(self):
         return self.secret
 
-    def age(self):
+    def get_age(self):
         return self.age
 
     def login(self, name, secret):
@@ -77,7 +77,7 @@ class System:
 
     def delete_user(self, name):
         for user in self.users:
-            if user.name() == name:
+            if user.name == name:
                 self.users.remove(user)
                 print(f"User {name} deleted")
                 return
@@ -86,14 +86,15 @@ class System:
 
 user_bp = Blueprint('user', __name__)
 
+system = System()
+
 
 @user_bp.route('/users', methods=['POST'])
 def create_user():
     is_not_blank(request.json['name'])
     is_not_blank(request.json['secret'])
     is_not_blank(request.json['age'])
-    system = System()
-    return jsonify(system.login_user(request.json['name'], request.json['secret'])), 201
+    return jsonify(system.add_user(request.json['name'], request.json['secret'], request.json['age'])), 201
 
 
 @user_bp.route('/users/login', methods=['POST'])
@@ -101,7 +102,6 @@ def login_user():
     is_not_blank(request.json['name'])
     is_not_blank(request.json['secret'])
     is_not_blank(request.json['age'])
-    system = System()
     if system.login_user(request.json['name'], request.json['secret']): return make_response(
         {'token': create_access_token(identity=system.hash_to_validate())}), 200
     return make_response({"menssage": "Invalid credentials"}), 401
@@ -110,13 +110,13 @@ def login_user():
 @user_bp.route('/users', methods=['GET'])
 @jwt_required()
 def get_users():
-    system = System()
     return jsonify(system.get_users()), 200
 
 
 csrf = CSRFProtect()
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.getenv("FLASK_SECRET_KEY", "default_secret_key")
 app.config["JWT_SECRET_KEY"] = os.getenv("SIGNING_KEY", "default_secret_key")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.register_blueprint(user_bp)
